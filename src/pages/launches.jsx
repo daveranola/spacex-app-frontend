@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listUpcomingLaunches } from "../services/spacex";
+import { historicalEvents } from "../services/spacex";
 
 export default function Launches() {
   const [items, setItems] = useState([]);
@@ -7,7 +7,7 @@ export default function Launches() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    listUpcomingLaunches()
+    historicalEvents()
       .then(setItems)
       .catch(setErr)
       .finally(() => setLoading(false));
@@ -19,7 +19,7 @@ export default function Launches() {
   return (
     <ul>
       {items.map((l) => (
-        <li key={l.id}>{l.name}</li>
+        <li key={l.id}>{l.title} <br /> {l.details} <br /> {l.event_date_utc} <br /> {l.links.article}</li>
       ))}
     </ul>
   );
