@@ -1,9 +1,9 @@
-import Launches from "./pages/Launches";
+import Rockets from "./pages/Rockets";
 
 function App() {
   return (
     <>
-        <Launches />
+        <Rockets />
     </>
   );
 }
