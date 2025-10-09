@@ -27,6 +27,7 @@ export default function Rockets() {
             style={{ width: "300px", borderRadius: "8px" }}
           />
           <p>Height: {l.height.meters} m</p>
+          <p>Diameter: {l.diameter.meters}</p>
           <p>Active: {l.active ? "Yes" : "No"}</p>
           <p>Cost per launch: ${l.cost_per_launch.toLocaleString()}</p>
           <p>{l.description}</p>
