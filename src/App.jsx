@@ -1,23 +1,15 @@
-import Rockets from "./pages/Rockets";
 import Login from "./components/login";
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
-
+import Signup from "./components/Signup";
+import { Route, Routes } from "react-router-dom";
+import Rockets from "./pages/Rockets";
 
 function App() {
   return (
-    <>
-        <BrowserRouter>
-          <nav>
-            <Link to="/">Login</Link>
-            <Link to="/Rockets">Rockets</Link>
-          </nav>
-
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/Rockets" element={<Rockets />} />
-          </Routes>
-        </BrowserRouter>
-    </>
+    <Routes>
+      <Route path="/" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/rockets" element={<Rockets />} />
+    </Routes>
   );
 }
 
