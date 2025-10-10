@@ -1,84 +1,85 @@
 import { useState } from "react";
-import { signup } from "../services/signup";
-import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-
-    if (!username.trim()) {
-      alert("Username is required.");
+    setError("");
+    if (form.password !== form.confirm) {
+      setError("Passwords do not match.");
       return;
     }
-    if (!email.trim()) {
-      alert("Email is required.");
-      return;
-    }
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
-      return;
-    }
-
+    setSubmitting(true);
     try {
-      setLoading(true);
-      await signup({ email: email.trim().toLowerCase(), username: username.trim(), password });
-      // clear sensitive input quickly
-      setPassword("");
-      navigate("/login");
+      // TODO: call your backend signup endpoint
+      // await api.signup(form)
+      alert(`Signup\nname: ${form.name}\nemail: ${form.email}`);
     } catch (err) {
-      const msg = err?.response?.data || "Sign up failed";
-      alert(typeof msg === "string" ? msg : "Sign up failed");
+      setError(err?.message || "Signup failed");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Sign up</h1>
+    <section className="auth">
+      <div className="auth-card">
+        <h1 className="auth-title">Create account</h1>
+        <p className="auth-subtitle">Join SpaceX Viewer in seconds</p>
 
-      <div>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoComplete="username"
-          required
-        />
+        {error && <div className="auth-error">{error}</div>}
+
+        <form className="form" onSubmit={onSubmit} noValidate>
+          <div className="field">
+            <label htmlFor="name">Name</label>
+            <input
+              id="name" name="name" type="text" className="input"
+              placeholder="Your name" autoComplete="name"
+              value={form.name} onChange={onChange} required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email" name="email" type="email" className="input"
+              placeholder="you@example.com" autoComplete="email"
+              value={form.email} onChange={onChange} required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password" name="password" type="password" className="input"
+              placeholder="Create a password" autoComplete="new-password"
+              value={form.password} onChange={onChange} required minLength={6}
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="confirm">Confirm password</label>
+            <input
+              id="confirm" name="confirm" type="password" className="input"
+              placeholder="Repeat password" autoComplete="new-password"
+              value={form.confirm} onChange={onChange} required minLength={6}
+            />
+          </div>
+
+          <button className="btn btn--primary" disabled={submitting}>
+            {submitting ? "Creating…" : "Sign up"}
+          </button>
+        </form>
+
+        <p className="auth-hint">
+          Already have an account? <a href="/login">Log in</a>
+        </p>
       </div>
-
-      <div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-        />
-      </div>
-
-      <div>
-        <input
-          type="password"
-          placeholder="Password (min 6 chars)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-          required
-        />
-      </div>
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Signing up..." : "Sign up"}
-      </button>
-    </form>
+    </section>
   );
 }

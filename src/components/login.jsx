@@ -1,65 +1,63 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../services/login"; // should export function login({ email, username, password })
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-
-    // require at least one identifier
-    if (!email.trim() && !username.trim()) {
-      alert("Enter email or username.");
-      return;
-    }
-
+    setError("");
+    setSubmitting(true);
     try {
-      await login({ email: email.trim(), username: username.trim(), password });
-      navigate("/rockets"); // adjust to your actual route
-    } catch {
-      alert("Invalid credentials");
+      // TODO: call your backend auth endpoint
+      // await api.login(form.email, form.password)
+      alert(`Login\nemail: ${form.email}`);
+    } catch (err) {
+      setError(err?.message || "Login failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-        <h1>Login</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoComplete="username"
-        />
-      </div>
+    <section className="auth">
+      <div className="auth-card">
+        <h1 className="auth-title">Log in</h1>
+        <p className="auth-subtitle">Welcome back to SpaceX Viewer</p>
 
-      <div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-        />
-      </div>
+        {error && <div className="auth-error">{error}</div>}
 
-      <div>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-        />
-      </div>
+        <form className="form" onSubmit={onSubmit} noValidate>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email" name="email" type="email" className="input"
+              placeholder="you@example.com" autoComplete="email"
+              value={form.email} onChange={onChange} required
+            />
+          </div>
 
-      <button type="submit">Login</button>
-    </form>
+          <div className="field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password" name="password" type="password" className="input"
+              placeholder="••••••••" autoComplete="current-password"
+              value={form.password} onChange={onChange} required
+            />
+          </div>
+
+          <button className="btn btn--primary" disabled={submitting}>
+            {submitting ? "Logging in…" : "Log in"}
+          </button>
+        </form>
+
+        <p className="auth-hint">
+          Don’t have an account? <a href="/">Sign up</a>
+        </p>
+      </div>
+    </section>
   );
 }
