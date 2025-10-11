@@ -34,7 +34,32 @@ export default function RocketDetail() {
     return () => { cancelled = true; };
   }, [id, initialRocket]);
 
-  const images = useMemo(() => rocket?.flickr_images ?? [], [rocket]);
+  // ---- Normalize key shape (works for snake_case from SpaceX OR camelCase from your DTO) ----
+  const flickrImages = useMemo(
+    () => rocket?.flickr_images ?? rocket?.flickrImages ?? [],
+    [rocket]
+  );
+  const firstFlight = rocket?.first_flight ?? rocket?.firstFlight;
+  const company = rocket?.company;
+  const country = rocket?.country;
+  const costPerLaunch = rocket?.cost_per_launch ?? rocket?.costPerLaunch;
+  const successRatePct = rocket?.success_rate_pct ?? rocket?.successRatePct;
+
+  const firstStageEngines = rocket?.first_stage?.engines ?? rocket?.firstStage?.engines;
+  const secondStageEngines = rocket?.second_stage?.engines ?? rocket?.secondStage?.engines;
+
+  const engines = rocket?.engines;
+  const engineNumber = engines?.number;
+  const engineType = engines?.type;
+  const engineLayout = engines?.layout;
+  const engineVersion = engines?.version;
+  const prop1 = engines?.propellant_1 ?? engines?.propellant1;
+  const prop2 = engines?.propellant_2 ?? engines?.propellant2;
+  const thrustToWeight = engines?.thrust_to_weight ?? engines?.thrustToWeight;
+
+  const isp = engines?.isp;
+  const ispSeaLevel = isp ? (isp.sea_level ?? isp.seaLevel) : undefined;
+  const ispVacuum = isp ? (isp.vacuum ?? isp.vacuum) : undefined;
 
   if (loading) {
     return (
@@ -103,8 +128,8 @@ export default function RocketDetail() {
             {rocket.active ? "Active Mission" : "Mission Complete"}
           </div>
         </div>
-        
-        {rocket.wikipedia && (
+
+        {(rocket.wikipedia || rocket.wikipedia) && (
           <a href={rocket.wikipedia} target="_blank" rel="noreferrer" className="wiki-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
@@ -115,19 +140,19 @@ export default function RocketDetail() {
       </header>
 
       {/* Main image gallery */}
-      {images.length > 0 && (
+      {flickrImages.length > 0 && (
         <div className="rocket-gallery">
           <div className="gallery-main">
             <img
-              src={images[selectedImage]}
+              src={flickrImages[selectedImage]}
               alt={rocket.name}
               className="gallery-main__img"
             />
           </div>
-          
-          {images.length > 1 && (
+
+          {flickrImages.length > 1 && (
             <div className="gallery-thumbnails">
-              {images.slice(0, 6).map((src, i) => (
+              {flickrImages.slice(0, 6).map((src, i) => (
                 <button
                   key={i}
                   className={`thumbnail ${selectedImage === i ? 'active' : ''}`}
@@ -157,7 +182,7 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>First Flight</h3>
-            <p>{rocket.first_flight || "—"}</p>
+            <p>{firstFlight || "—"}</p>
           </div>
         </div>
 
@@ -167,8 +192,8 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>Origin</h3>
-            <p>{rocket.country || "—"}</p>
-            <span className="stat-subtitle">{rocket.company || "—"}</span>
+            <p>{country || "—"}</p>
+            <span className="stat-subtitle">{company || "—"}</span>
           </div>
         </div>
 
@@ -178,7 +203,7 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>Dimensions</h3>
-            <p>H: {rocket.height?.meters ?? "—"}m ×  {rocket.diameter?.meters ?? "—"}m</p>
+            <p>H: {rocket.height?.meters ?? "—"}m × {rocket.diameter?.meters ?? "—"}m</p>
             <span className="stat-subtitle">
               Mass: {rocket.mass?.kg ? `${(rocket.mass.kg / 1000).toLocaleString()} tons` : "—"}
             </span>
@@ -191,7 +216,7 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>Cost per Launch</h3>
-            <p>{rocket.cost_per_launch ? `$${rocket.cost_per_launch.toLocaleString()}` : "—"}</p>
+            <p>{costPerLaunch ? `$${costPerLaunch.toLocaleString()}` : "—"}</p>
           </div>
         </div>
 
@@ -201,7 +226,7 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>Success Rate</h3>
-            <p>{rocket.success_rate_pct ? `${rocket.success_rate_pct}%` : "—"}</p>
+            <p>{successRatePct ? `${successRatePct}%` : "—"}</p>
           </div>
         </div>
 
@@ -211,9 +236,9 @@ export default function RocketDetail() {
           </svg>
           <div className="stat-content">
             <h3>Engines</h3>
-            <p>{rocket.engines?.number ?? "—"} × {rocket.engines?.type || "—"}</p>
+            <p>{engineNumber ?? "—"} × {engineType || "—"}</p>
             <span className="stat-subtitle">
-              {[rocket.engines?.propellant_1, rocket.engines?.propellant_2].filter(Boolean).join(" + ") || "—"}
+              {[prop1, prop2].filter(Boolean).join(" + ") || "—"}
             </span>
           </div>
         </div>
@@ -227,15 +252,15 @@ export default function RocketDetail() {
             <h4>Propulsion</h4>
             <div className="spec-item">
               <span>Engine Type</span>
-              <span>{rocket.engines?.type || "—"}</span>
+              <span>{engineType || "—"}</span>
             </div>
             <div className="spec-item">
               <span>Engine Layout</span>
-              <span>{rocket.engines?.layout || "—"}</span>
+              <span>{engineLayout || "—"}</span>
             </div>
             <div className="spec-item">
               <span>Engine Version</span>
-              <span>{rocket.engines?.version || "—"}</span>
+              <span>{engineVersion || "—"}</span>
             </div>
           </div>
 
@@ -243,15 +268,15 @@ export default function RocketDetail() {
             <h4>Performance</h4>
             <div className="spec-item">
               <span>Thrust to Weight</span>
-              <span>{rocket.engines?.thrust_to_weight ? rocket.engines.thrust_to_weight.toFixed(1) : "—"}</span>
+              <span>{typeof thrustToWeight === "number" ? thrustToWeight.toFixed(1) : "—"}</span>
             </div>
             <div className="spec-item">
               <span>ISP (Sea Level)</span>
-              <span>{rocket.engines?.isp?.sea_level ?? "—"} s</span>
+              <span>{ispSeaLevel ?? "—"} s</span>
             </div>
             <div className="spec-item">
               <span>ISP (Vacuum)</span>
-              <span>{rocket.engines?.isp?.vacuum ?? "—"} s</span>
+              <span>{ispVacuum ?? "—"} s</span>
             </div>
           </div>
 
@@ -259,11 +284,11 @@ export default function RocketDetail() {
             <h4>Stages</h4>
             <div className="spec-item">
               <span>First Stage</span>
-              <span>{rocket.first_stage?.engines ?? "—"} engines</span>
+              <span>{firstStageEngines ?? "—"} engines</span>
             </div>
             <div className="spec-item">
               <span>Second Stage</span>
-              <span>{rocket.second_stage?.engines ?? "—"} engines</span>
+              <span>{secondStageEngines ?? "—"} engines</span>
             </div>
             <div className="spec-item">
               <span>Boosters</span>
