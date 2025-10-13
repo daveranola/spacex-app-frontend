@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../services/auth.jsx";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -12,11 +16,15 @@ export default function Login() {
     setError("");
     setSubmitting(true);
     try {
-      // TODO: call your backend auth endpoint
-      // await api.login(form.email, form.password)
-      alert(`Login\nemail: ${form.email}`);
+      await login({ email: form.email.trim(), password: form.password });
+      navigate("/rockets");
     } catch (err) {
-      setError(err?.message || "Login failed");
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Login failed";
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -55,7 +63,7 @@ export default function Login() {
         </form>
 
         <p className="auth-hint">
-          Don’t have an account? <a href="/">Sign up</a>
+          Don’t have an account? <Link to="/">Sign up</Link>
         </p>
       </div>
     </section>

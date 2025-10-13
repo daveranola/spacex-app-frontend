@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllRockets } from "../services/spacex";
+import { useAuth } from "../services/auth.jsx";
+import { useFavorites } from "../services/favorites.jsx";
 
 function SkeletonCard() {
   return (
@@ -25,6 +27,7 @@ function SkeletonCard() {
 }
 
 export default function Rockets() {
+  const { user, authLoading } = useAuth();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +54,14 @@ export default function Rockets() {
     const msg = String(err?.message || err);
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <svg class="error-icon" width="100" height="100" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Error">
+          <path d="M12 3L2.5 20.25c-.37.64.09 1.5.82 1.5h17.36c.73 0 1.19-.86.82-1.5L12 3z"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 9v5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="12" cy="18" r="1.2" fill="currentColor"/>
+        </svg>
+
         <h2>Launch Sequence Interrupted</h2>
         <p>{msg}</p>
         <button className="btn btn--primary" onClick={() => location.reload()}>
@@ -96,7 +106,7 @@ export default function Rockets() {
       ) : (
         <div className="rockets-grid">
           {filtered.map((rocket) => (
-            <RocketCard key={rocket.id} rocket={rocket} />
+            <RocketCard key={rocket.id} rocket={rocket} user={user} authLoading={authLoading} />
           ))}
         </div>
       )}
@@ -112,7 +122,10 @@ export default function Rockets() {
   );
 }
 
-function RocketCard({ rocket }) {
+function RocketCard({ rocket, user, authLoading }) {
+  const navigate = useNavigate();
+  const { has, toggle } = useFavorites();
+  const faved = has(rocket.id);
   return (
     <article className="card-rocket">
       <Link
@@ -182,6 +195,15 @@ function RocketCard({ rocket }) {
               Wikipedia
             </a>
           )}
+          <button
+            type="button"
+            className="btn btn--outline"
+            onClick={() => (authLoading ? null : (user ? toggle(rocket.id) : (console.log("[fav] no user → redirect"), navigate("/login"))))}
+            aria-pressed={faved}
+            title={faved ? "Unfavorite" : "Add to favorites"}
+          >
+            {faved ? "★ Favorited" : "☆ Favorite"}
+          </button>
         </div>
       </div>
     </article>

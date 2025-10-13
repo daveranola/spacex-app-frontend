@@ -1,16 +1,14 @@
-import axios from "axios";
-import api from "./http"; // axios instance with baseURL + withCredentials
+import api from "./http"; // axios instance (baseURL + withCredentials + interceptor)
 
 export async function login({ email, username, password }) {
-  const { data } = await api.post("/auth/login", { email, username, password });
-  return data; // e.g., { userId, name }
+  // api.* already returns res.data (because of the interceptor)
+  return api.post("/auth/login", { email, username, password });
 }
 
 export async function me() {
-  const { data } = await api.get("/auth/me");
-  return data; // { userId, name }
+  return api.get("/auth/me");
 }
 
 export async function logout() {
-  await api.post("/auth/logout");
+  return api.post("/auth/logout");
 }

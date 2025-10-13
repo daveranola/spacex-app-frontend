@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { signup as apiSignup } from "../services/signup"; // posts to your /auth/signup (or /users)
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -16,11 +19,23 @@ export default function Signup() {
     }
     setSubmitting(true);
     try {
-      // TODO: call your backend signup endpoint
-      // await api.signup(form)
-      alert(`Signup\nname: ${form.name}\nemail: ${form.email}`);
+      // Adjust field names if your backend expects different keys
+      await apiSignup({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        // add username here if your backend expects it:
+        // username: someValue
+      });
+      // success → send user to login (or auto-login if you prefer)
+      navigate("/login");
     } catch (err) {
-      setError(err?.message || "Signup failed");
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Signup failed";
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -77,7 +92,7 @@ export default function Signup() {
         </form>
 
         <p className="auth-hint">
-          Already have an account? <a href="/login">Log in</a>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </div>
     </section>
