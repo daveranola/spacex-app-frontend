@@ -5,6 +5,8 @@ import App from "./App.jsx";
 import { AuthProvider } from "./services/auth.jsx";
 import { FavoritesProvider } from "./services/favorites.jsx";
 
+const basename = import.meta.env.BASE_URL;
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>

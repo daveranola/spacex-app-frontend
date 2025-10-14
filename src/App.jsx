@@ -1,6 +1,5 @@
-// App.jsx
 import { Route, Routes } from "react-router-dom";
-import Login from "./components/login";
+import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Rockets from "./pages/Rockets";
 import SiteLayout from "./components/SiteLayout";
@@ -14,7 +13,7 @@ function App() {
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/rockets" element={<Rockets />} />
-        <Route path="/rockets/:id" element={<RocketDetail />} /> {/* ⬅️ new */}
+        <Route path="/rockets/:id" element={<RocketDetail />} />
         <Route path="/favorites" element={<Favorites />} />
       </Route>
     </Routes>
