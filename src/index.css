@@ -1139,3 +1139,14 @@ label{
     min-width: 0;
   }
 }
+
+.wake-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 14px;
+  background: rgba(32, 150, 243, 0.12);
+  border-bottom: 1px solid rgba(32, 150, 243, 0.35);
+  backdrop-filter: blur(6px);
+  font-size: 0.95rem;
+}
